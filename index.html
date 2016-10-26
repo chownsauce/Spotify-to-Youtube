@@ -14,10 +14,28 @@
 
 	<body ng-controller="MainController">
 
-    {{ message }}
+    <div class="spotify">
+
+      <button ng-if="spotifyUser == null" ng-click="spotifyLogin()">Connect to your Spotify account</button>
+
+      <div class="profile" ng-if="spotifyUser != null">
+        <img src="{{ spotifyUser.images[0].url }}" alt="">
+        <span>{{ spotifyUser.display_name }}</span>
+      </div>
+
+      <div class="playlists" ng-if="spotifyPlaylists != null">
+        <select ng-model="selectedPlaylist.playlist" ng-options="pl.name for pl in spotifyPlaylists.items track by pl.id">
+        </select>
+      </div>
+
+    </div>
+
+    <button ng-click="convert()">Convert !</button>
 
 	</body>
 
 	<script src="./bower_components/angular/angular.min.js"></script>
-	<script src="./main.js"></script>
+	<script src="./bower_components/angular-spotify/dist/angular-spotify.min.js"></script>
+  <script src="./config.js"></script>
+  <script src="./main.js"></script>
 </html>
