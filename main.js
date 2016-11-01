@@ -51,8 +51,15 @@ appControllers.controller('MainController', [ '$scope', 'Spotify', function ($sc
   }
 
   $scope.convert = function() {
-    if ($scope.selectedPlaylist.playlist != "")
+    if ($scope.selectedPlaylist.playlist != "") {
       console.log("Converting Spotify playlist " + $scope.selectedPlaylist.playlist.id);
+
+      Spotify.getPlaylistTracks($scope.spotifyUser.id, $scope.selectedPlaylist.playlist.id, {})
+      .then(function(data) {
+        $scope.songs = data;
+        console.log(data);
+      });
+    }
   };
 
 
