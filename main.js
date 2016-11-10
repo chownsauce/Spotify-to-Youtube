@@ -1,5 +1,5 @@
 var app = angular
-  .module('app', ['appControllers','appServices','appFilters', 'spotify'])
+  .module('app', ['appControllers','appServices','appFilters', 'spotify', 'angular-google-gapi'])
   .config(function (SpotifyProvider) {
     SpotifyProvider.setClientId(config.spotify.clientId);
     SpotifyProvider.setRedirectUri(config.spotify.redirectUri);
@@ -11,7 +11,7 @@ var appControllers = angular.module('appControllers', []);
 var appServices = angular.module('appServices', []);
 var appFilters = angular.module('appFilters', []);
 
-appControllers.controller('MainController', [ '$scope', 'Spotify', function ($scope, Spotify) {
+appControllers.controller('MainController', [ '$scope', 'Spotify', 'GAuth', 'GData', 'GApi', function ($scope, Spotify, GAuth, GData, GApi) {
 
   // Getting Spotify token from URL
   var hash = window.location.hash;
@@ -62,6 +62,18 @@ appControllers.controller('MainController', [ '$scope', 'Spotify', function ($sc
     }
   };
 
+  $scope.youtubeUser = null;
 
+  GAuth.setClient(config.youtube.clientId);
+  GAuth.setScope(config.youtube.scope);
+
+  $scope.youtubeLogin = function() {
+    GAuth.login().then(function(user) {
+      $scope.youtubeUser = user;
+      console.log(user);
+    }, function() {
+        console.log('login failed');
+    });
+  };
 
 }]);

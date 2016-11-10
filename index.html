@@ -30,12 +30,19 @@
 
     </div>
 
+		<div class="youtube">
+
+			<button ng-if="youtubeUser == null" ng-click="youtubeLogin()">Connect to your Youtube account</button>
+
+		</div>
+
     <button ng-click="convert()">Convert !</button>
 
 	</body>
 
 	<script src="./bower_components/angular/angular.min.js"></script>
 	<script src="./bower_components/angular-spotify/dist/angular-spotify.min.js"></script>
+	<script src="./bower_components/angular-google-gapi/dist/angular-google-gapi.min.js"></script>
   <script src="./config.js"></script>
-  <script src="./main.js"></script>
+	<script src="./main.js"></script>
 </html>
