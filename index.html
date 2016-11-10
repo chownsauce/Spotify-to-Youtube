@@ -34,6 +34,11 @@
 
 			<button ng-if="youtubeUser == null" ng-click="youtubeLogin()">Connect to your Youtube account</button>
 
+			<div class="profile" ng-if="youtubeUser != null">
+        <img src="{{ youtubeUser.picture }}" alt="">
+        <span>{{ youtubeUser.name }}</span>
+      </div>
+
 		</div>
 
     <button ng-click="convert()">Convert !</button>
@@ -42,7 +47,7 @@
 
 	<script src="./bower_components/angular/angular.min.js"></script>
 	<script src="./bower_components/angular-spotify/dist/angular-spotify.min.js"></script>
-	<script src="./bower_components/angular-google-gapi/dist/angular-google-gapi.min.js"></script>
+	<script src="./bower_components/angular-google-gapi/dist/angular-google-gapi.js"></script>
   <script src="./config.js"></script>
 	<script src="./main.js"></script>
 </html>

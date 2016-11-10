@@ -50,22 +50,11 @@ appControllers.controller('MainController', [ '$scope', 'Spotify', 'GAuth', 'GDa
     });
   }
 
-  $scope.convert = function() {
-    if ($scope.selectedPlaylist.playlist != "") {
-      console.log("Converting Spotify playlist " + $scope.selectedPlaylist.playlist.id);
-
-      Spotify.getPlaylistTracks($scope.selectedPlaylist.playlist.owner.id, $scope.selectedPlaylist.playlist.id, {})
-      .then(function(data) {
-        $scope.songs = data;
-        console.log(data);
-      });
-    }
-  };
-
   $scope.youtubeUser = null;
 
   GAuth.setClient(config.youtube.clientId);
   GAuth.setScope(config.youtube.scope);
+  GApi.load('youtube', 'v3');
 
   $scope.youtubeLogin = function() {
     GAuth.login().then(function(user) {
@@ -74,6 +63,86 @@ appControllers.controller('MainController', [ '$scope', 'Spotify', 'GAuth', 'GDa
     }, function() {
         console.log('login failed');
     });
+  };
+
+  $scope.videos = [];
+  $scope.playlist = null;
+  function afterSongLoading() {
+    GApi.execute(
+      'youtube',
+      'playlists.insert',
+      {
+        part: "snippet,status",
+        snippet: {
+          title: $scope.selectedPlaylist.playlist.name
+        },
+        status: {
+          privacyStatus: 'private'
+        }
+      }
+    ).then(function(resp) {
+      $scope.playlist = resp.result;
+      console.log(resp);
+      pushSong(0);
+    }, function(e) {
+      console.log('error :(');
+      console.log(e);
+    });
+  }
+
+  function afterSongPush() {
+    console.log('Voila');
+  }
+
+  function pushSong(index) {
+    if (index >= $scope.videos.length || index >= 50)
+      return afterSongPush();
+    GApi.execute(
+      'youtube',
+      'playlistItems.insert',
+      {
+        part: "snippet",
+        resource: {
+          snippet: {
+            playlistId: $scope.playlist.id,
+            resourceId: {
+              videoId: $scope.videos[index],
+              kind: 'youtube#video'
+            }
+          }
+        }
+      }
+    ).then(function(resp) {
+      pushSong(index + 1);
+    }, function() {
+        console.log('error :(');
+    });
+  }
+
+  function loadSong(index) {
+    if (index >= $scope.songs.length || index >= 50)
+      return afterSongLoading();
+    GApi.execute('youtube', 'search.list', { part: "id,snippet", q: $scope.songs[index].track.name + " " + $scope.songs[index].track.artists[0].name }).then(function(resp) {
+      console.log(resp);
+      if (resp.items.length)
+        $scope.videos.push(resp.items[0].id.videoId);
+      loadSong(index + 1);
+    }, function() {
+      console.log('error :(');
+    });
+  }
+
+  $scope.convert = function() {
+    if ($scope.selectedPlaylist.playlist != "") {
+      console.log("Converting Spotify playlist " + $scope.selectedPlaylist.playlist.id);
+
+      Spotify.getPlaylistTracks($scope.selectedPlaylist.playlist.owner.id, $scope.selectedPlaylist.playlist.id, {})
+      .then(function(data) {
+        $scope.songs = data.items;
+        console.log(data);
+        loadSong(0);
+      });
+    }
   };
 
 }]);
