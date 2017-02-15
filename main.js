@@ -50,16 +50,27 @@ appControllers.controller('MainController', [ '$scope', 'Spotify', 'GAuth', 'GDa
     });
   }
 
+  // Getting Google token from local storage
+  $scope.googleToken = localStorage.getItem('google-token');
   $scope.youtubeUser = null;
 
   GAuth.setClient(config.youtube.clientId);
   GAuth.setScope(config.youtube.scope);
   GApi.load('youtube', 'v3');
 
+  if ($scope.googleToken) {
+    GAuth.setToken({ access_token: $scope.googleToken }).then(function() {
+      $scope.youtubeUser = GData.getUser();
+    });
+  }
+
   $scope.youtubeLogin = function() {
     GAuth.login().then(function(user) {
-      $scope.youtubeUser = user;
       console.log(user);
+      $scope.youtubeUser = user;
+      GAuth.getToken().then(function(d) {
+        localStorage.setItem('google-token', d.access_token);
+      });
     }, function() {
         console.log('login failed');
     });
