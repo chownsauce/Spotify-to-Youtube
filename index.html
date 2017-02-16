@@ -14,34 +14,42 @@
 
 	<body ng-controller="MainController">
 
-    <div class="spotify">
+		<div class="social-networks">
+	    <div class="spotify">
 
-      <button ng-if="spotifyUser == null" ng-click="spotifyLogin()">Connect to your Spotify account</button>
+				<img src="./img/spotify.png" class="logo" alt="Spotify">
 
-      <div class="profile" ng-if="spotifyUser != null">
-        <img src="{{ spotifyUser.images[0].url }}" alt="">
-        <span>{{ spotifyUser.display_name }}</span>
-      </div>
+	      <button ng-if="spotifyUser == null" ng-click="spotifyLogin()">Connect to your Spotify account</button>
 
-      <div class="playlists" ng-if="spotifyPlaylists != null">
-        <select ng-model="selectedPlaylist.playlist" ng-options="pl.name for pl in spotifyPlaylists.items track by pl.id">
-        </select>
-      </div>
+	      <div class="profile" ng-if="spotifyUser != null">
+	        <img src="{{ spotifyUser.images[0].url }}" alt="">
+	        <span>Connected as {{ spotifyUser.display_name }}</span>
+	      </div>
 
-    </div>
+	      <div class="playlists" ng-if="spotifyPlaylists != null">
+					<select ng-model="selectedPlaylist.playlist" ng-options="pl.name for pl in spotifyPlaylists.items track by pl.id">
+	        </select>
+	      </div>
 
-		<div class="youtube">
+	    </div>
 
-			<button ng-if="youtubeUser == null" ng-click="youtubeLogin()">Connect to your Youtube account</button>
+			<div class="youtube">
 
-			<div class="profile" ng-if="youtubeUser != null">
-        <img src="{{ youtubeUser.picture }}" alt="">
-        <span>{{ youtubeUser.name }}</span>
-      </div>
+				<img src="./img/youtube.png" class="logo" alt="Youtube">
 
+				<button ng-if="youtubeUser == null" ng-click="youtubeLogin()">Connect to your Youtube account</button>
+
+				<div class="profile" ng-if="youtubeUser != null">
+	        <img src="{{ youtubeUser.picture }}" alt="">
+	        <span>Connected as {{ youtubeUser.name }}</span>
+	      </div>
+
+			</div>
 		</div>
 
-    <button ng-click="convert()">Convert !</button>
+		<div id="action-bar" ng-click="convert()" ng-class="{ disabled: !youtubeUser || !spotifyUser }">
+			Convert
+		</div>
 
 	</body>
 

@@ -1,0 +1,115 @@
+html, body {
+  background: #4B79A1;
+  background: -webkit-linear-gradient(to left, #4B79A1 , #283E51);
+  background: linear-gradient(to left, #4B79A1 , #283E51);
+  margin: 0;
+  height: 100vh;
+  font-family: "Open Sans", arial, sans-serif;
+}
+
+body {
+
+  .social-networks {
+    width: 100%;
+    display: table;
+    table-layout: fixed;
+
+    > div {
+      display: table-cell;
+      height: 75vh;
+      text-align: center;
+      padding: 40px;
+
+      .logo {
+        width: 165px;
+        display: block;
+        margin: auto;
+        margin-bottom: 40px;
+      }
+      &.youtube .logo {
+        position: relative;
+        top: -21px;
+      }
+
+      button {
+        padding: 10px 20px;
+        border: 3px solid #FFF;
+        color: #FFF;
+        background: transparent;
+        font-size: 16px;
+        cursor: pointer;
+      }
+
+    }
+
+    .profile {
+      img {
+        width: 40px;
+        border-radius: 50%;
+      }
+      span {
+        padding-left: 20px;
+        position: relative;
+        top: -14px;
+        color: #FFF;
+      }
+    }
+
+    div.playlists {
+      position: relative;
+      width: 300px;
+      margin: auto;
+
+      select {
+        border: 3px solid #FFF;
+        padding: 10px 20px;
+        color: #FFF;
+        background: transparent;
+        border-radius: 0;
+        margin: 20px 0;
+        width: 100%;
+        cursor: pointer;
+
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+      }
+
+      &::after {
+        content: "";
+        position: absolute;
+        right: 10px;
+        top: 0;
+        bottom: 0;
+        margin: auto;
+        background: url('./img/more.png');
+        background-size: contain;
+        background-repeat: no-repeat;
+        width: 20px;
+        height: 12px;
+      }
+    }
+
+  }
+
+  #action-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    color: #FFF;
+    background: #3bce65;
+    border: 0;
+    padding: 20px 0;
+    font-size: 18px;
+    text-align: center;
+    cursor: pointer;
+
+    &.disabled {
+      background: #b8bfba;
+    }
+  }
+
+
+
+}
