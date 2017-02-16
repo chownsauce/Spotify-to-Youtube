@@ -26,8 +26,8 @@
 	        <span>Connected as {{ spotifyUser.display_name }}</span>
 	      </div>
 
-	      <div class="playlists" ng-if="spotifyPlaylists != null">
-					<select ng-model="selectedPlaylist.playlist" ng-options="pl.name for pl in spotifyPlaylists.items track by pl.id" ng-change="updatePlaylistName()">
+	      <div class="playlists" ng-if="startingPlaylist.list != null">
+					<select ng-model="startingPlaylist.selected" ng-options="pl.name for pl in startingPlaylist.list.items track by pl.id" ng-change="updatePlaylistName()">
 	        </select>
 	      </div>
 
@@ -53,13 +53,13 @@
 
 		<div class="loading" ng-if="convertedPlaylist.loading">
 			<div>
-				{{ convertedPlaylist.progress }} %
+				{{ convertedPlaylist.progress | number: 0 }} %
 			</div>
 		</div>
 
 		<div class="loaded" ng-if="!convertedPlaylist.loading && convertedPlaylist.progress == 100">
 			<div>
-				You're good to go, <a href="https://www.youtube.com/playlist?list={{ playlist.id }}" target="_BLANK">here</a> is your playlist !
+				You're good to go, <a href="https://www.youtube.com/playlist?list={{ convertedPlaylist.object.id }}" target="_BLANK">here</a> is your playlist !
 			</div>
 		</div>
 

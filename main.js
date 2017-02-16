@@ -7,11 +7,27 @@ var app = angular
     if (localStorage.getItem('spotify-token'))
       SpotifyProvider.setAuthToken(localStorage.getItem('spotify-token'));
   });
+
 var appControllers = angular.module('appControllers', []);
 var appServices = angular.module('appServices', []);
 var appFilters = angular.module('appFilters', []);
 
 appControllers.controller('MainController', [ '$scope', 'Spotify', 'GAuth', 'GData', 'GApi', function ($scope, Spotify, GAuth, GData, GApi) {
+
+  $scope.convertedPlaylist = {
+    name: "Playlist name on Youtube",
+    progress: 0,
+    loading: false,
+    object: null,
+    videos: []
+  };
+
+
+  //
+  // INITIALIZING SPOTIFY CLIENT
+  //
+
+  $scope.spotifyUser = null;
 
   // Getting Spotify token from URL
   var hash = window.location.hash;
@@ -21,52 +37,43 @@ appControllers.controller('MainController', [ '$scope', 'Spotify', 'GAuth', 'GDa
     localStorage.setItem('spotify-token', token);
   }
 
-  $scope.convertedPlaylist = { name: "Playlist name on Youtube", progress: 0, loading: false };
-
   // Getting Spotify token from local storage
   $scope.spotifyToken = localStorage.getItem('spotify-token');
 
+  // Loading user data from API
   if ($scope.spotifyToken)
     loadSpotifyData();
 
-  $scope.spotifyLogin = function () {
-    Spotify.login()
-      .then(function (data) {
-        loadSpotifyData();
-      });
-  };
 
-  $scope.spotifyUser = null;
-  $scope.spotifyPlaylists = null;
-  $scope.selectedPlaylist = { playlist: "" };
-  function loadSpotifyData() {
-    Spotify.getCurrentUser().then(function(data) {
-      $scope.spotifyUser = data;
-      loadSpotifyPlaylists();
-    });
-  }
+  //
+  // INITIALIZING GOOGLE CLIENT
+  //
 
-  function loadSpotifyPlaylists() {
-    Spotify.getUserPlaylists($scope.spotifyUser.id, { limit: 50 }).then(function(data) {
-      $scope.spotifyPlaylists = data;
-      $scope.selectedPlaylist.playlist = data.items[0];
-      $scope.convertedPlaylist.name = data.items[0].name;
-    });
-  }
-
-  // Getting Google token from local storage
-  $scope.googleToken = localStorage.getItem('google-token');
   $scope.youtubeUser = null;
+
+  // Getting Spotify token from URL
+  $scope.googleToken = localStorage.getItem('google-token');
 
   GAuth.setClient(config.youtube.clientId);
   GAuth.setScope(config.youtube.scope);
   GApi.load('youtube', 'v3');
 
+  // Loading Google user data
   if ($scope.googleToken) {
-    GAuth.setToken({ access_token: $scope.googleToken }).then(function() {
-      $scope.youtubeUser = GData.getUser();
-    });
+    GAuth.setToken({ access_token: $scope.googleToken }).then(
+      function() {
+        $scope.youtubeUser = GData.getUser();
+      }
+    );
   }
+
+
+  //
+  // LOGGING PROCEDURES
+  //
+  $scope.spotifyLogin = function () {
+    Spotify.login().then(loadSpotifyData);
+  };
 
   $scope.youtubeLogin = function() {
     GAuth.login().then(function(user) {
@@ -80,12 +87,40 @@ appControllers.controller('MainController', [ '$scope', 'Spotify', 'GAuth', 'GDa
     });
   };
 
-  $scope.updatePlaylistName = function() {
-    $scope.convertedPlaylist.name = $scope.selectedPlaylist.playlist.name;
+
+  //
+  // GETTING DATA FROM APIS
+  //
+
+  $scope.startingPlaylist = {
+    list: null,
+    selected: null,
+  };
+
+  function loadSpotifyData() {
+    Spotify.getCurrentUser().then(function(data) {
+      $scope.spotifyUser = data;
+      loadSpotifyPlaylists();
+    });
   }
 
-  $scope.videos = [];
-  $scope.playlist = null;
+  function loadSpotifyPlaylists() {
+    Spotify.getUserPlaylists($scope.spotifyUser.id, { limit: 50 }).then(function(data) {
+      $scope.startingPlaylist.list = data;
+      $scope.startingPlaylist.selected = data.items[0];
+      $scope.convertedPlaylist.name = data.items[0].name;
+    });
+  }
+
+  $scope.updatePlaylistName = function() {
+    $scope.convertedPlaylist.name = $scope.startingPlaylist.selected.name;
+  }
+
+
+  //
+  // CONVERTING PLAYLIST
+  //
+
   function afterSongLoading() {
     GApi.execute(
       'youtube',
@@ -100,7 +135,7 @@ appControllers.controller('MainController', [ '$scope', 'Spotify', 'GAuth', 'GDa
         }
       }
     ).then(function(resp) {
-      $scope.playlist = resp.result;
+      $scope.convertedPlaylist.object = resp.result;
       console.log(resp);
       pushSong(0);
     }, function(e) {
@@ -110,13 +145,12 @@ appControllers.controller('MainController', [ '$scope', 'Spotify', 'GAuth', 'GDa
   }
 
   function afterSongPush() {
-    console.log('Voila');
     $scope.convertedPlaylist.progress = 100;
     $scope.convertedPlaylist.loading = false;
   }
 
   function pushSong(index) {
-    if (index >= $scope.videos.length || index >= 50)
+    if (index >= $scope.convertedPlaylist.videos.length || index >= 50)
       return afterSongPush();
     GApi.execute(
       'youtube',
@@ -125,9 +159,9 @@ appControllers.controller('MainController', [ '$scope', 'Spotify', 'GAuth', 'GDa
         part: "snippet",
         resource: {
           snippet: {
-            playlistId: $scope.playlist.id,
+            playlistId: $scope.convertedPlaylist.object.id,
             resourceId: {
-              videoId: $scope.videos[index],
+              videoId: $scope.convertedPlaylist.videos[index],
               kind: 'youtube#video'
             }
           }
@@ -146,7 +180,7 @@ appControllers.controller('MainController', [ '$scope', 'Spotify', 'GAuth', 'GDa
     GApi.execute('youtube', 'search.list', { part: "id,snippet", q: $scope.songs[index].track.name + " " + $scope.songs[index].track.artists[0].name }).then(function(resp) {
       console.log(resp);
       if (resp.items.length)
-        $scope.videos.push(resp.items[0].id.videoId);
+        $scope.convertedPlaylist.videos.push(resp.items[0].id.videoId);
       $scope.convertedPlaylist.progress += 100 / $scope.songs.length;
       loadSong(index + 1);
     }, function() {
@@ -155,11 +189,11 @@ appControllers.controller('MainController', [ '$scope', 'Spotify', 'GAuth', 'GDa
   }
 
   $scope.convert = function() {
-    if ($scope.selectedPlaylist.playlist != "") {
+    if ($scope.startingPlaylist.selected != "") {
       $scope.convertedPlaylist.loading = true;
-      console.log("Converting Spotify playlist " + $scope.selectedPlaylist.playlist.id);
+      console.log("Converting Spotify playlist " + $scope.startingPlaylist.selected.id);
 
-      Spotify.getPlaylistTracks($scope.selectedPlaylist.playlist.owner.id, $scope.selectedPlaylist.playlist.id, {})
+      Spotify.getPlaylistTracks($scope.startingPlaylist.selected.owner.id, $scope.startingPlaylist.selected.id, {})
       .then(function(data) {
         $scope.songs = data.items;
         console.log(data);
