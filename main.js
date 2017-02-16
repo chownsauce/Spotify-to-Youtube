@@ -21,7 +21,7 @@ appControllers.controller('MainController', [ '$scope', 'Spotify', 'GAuth', 'GDa
     localStorage.setItem('spotify-token', token);
   }
 
-  $scope.convertedPlaylist = { name: "Playlist name on Youtube" };
+  $scope.convertedPlaylist = { name: "Playlist name on Youtube", progress: 0, loading: false };
 
   // Getting Spotify token from local storage
   $scope.spotifyToken = localStorage.getItem('spotify-token');
@@ -111,6 +111,8 @@ appControllers.controller('MainController', [ '$scope', 'Spotify', 'GAuth', 'GDa
 
   function afterSongPush() {
     console.log('Voila');
+    $scope.convertedPlaylist.progress = 100;
+    $scope.convertedPlaylist.loading = false;
   }
 
   function pushSong(index) {
@@ -145,6 +147,7 @@ appControllers.controller('MainController', [ '$scope', 'Spotify', 'GAuth', 'GDa
       console.log(resp);
       if (resp.items.length)
         $scope.videos.push(resp.items[0].id.videoId);
+      $scope.convertedPlaylist.progress += 100 / $scope.songs.length;
       loadSong(index + 1);
     }, function() {
       console.log('error :(');
@@ -153,6 +156,7 @@ appControllers.controller('MainController', [ '$scope', 'Spotify', 'GAuth', 'GDa
 
   $scope.convert = function() {
     if ($scope.selectedPlaylist.playlist != "") {
+      $scope.convertedPlaylist.loading = true;
       console.log("Converting Spotify playlist " + $scope.selectedPlaylist.playlist.id);
 
       Spotify.getPlaylistTracks($scope.selectedPlaylist.playlist.owner.id, $scope.selectedPlaylist.playlist.id, {})

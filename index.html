@@ -14,7 +14,7 @@
 
 	<body ng-controller="MainController">
 
-		<div class="social-networks">
+		<div class="social-networks" ng-if="!convertedPlaylist.loading && convertedPlaylist.progress == 0">
 	    <div class="spotify">
 
 				<img src="./img/spotify.png" class="logo" alt="Spotify">
@@ -44,14 +44,26 @@
 	        <span>Connected as {{ youtubeUser.name }}</span>
 	      </div>
 
-				<div>
+				<div ng-if="youtubeUser != null">
 					<input type="text" ng-model="convertedPlaylist.name">
 				</div>
 
 			</div>
 		</div>
 
-		<div id="action-bar" ng-click="convert()" ng-class="{ disabled: !youtubeUser || !spotifyUser }">
+		<div class="loading" ng-if="convertedPlaylist.loading">
+			<div>
+				{{ convertedPlaylist.progress }} %
+			</div>
+		</div>
+
+		<div class="loaded" ng-if="!convertedPlaylist.loading && convertedPlaylist.progress == 100">
+			<div>
+				You're good to go, <a href="https://www.youtube.com/playlist?list={{ playlist.id }}" target="_BLANK">here</a> is your playlist !
+			</div>
+		</div>
+
+		<div id="action-bar" ng-click="convert()" ng-class="{ disabled: !youtubeUser || !spotifyUser }" ng-if="!convertedPlaylist.loading && convertedPlaylist.progress == 0">
 			Convert
 		</div>
 
