@@ -27,7 +27,7 @@
 	      </div>
 
 	      <div class="playlists" ng-if="spotifyPlaylists != null">
-					<select ng-model="selectedPlaylist.playlist" ng-options="pl.name for pl in spotifyPlaylists.items track by pl.id">
+					<select ng-model="selectedPlaylist.playlist" ng-options="pl.name for pl in spotifyPlaylists.items track by pl.id" ng-change="updatePlaylistName()">
 	        </select>
 	      </div>
 
@@ -43,6 +43,10 @@
 	        <img src="{{ youtubeUser.picture }}" alt="">
 	        <span>Connected as {{ youtubeUser.name }}</span>
 	      </div>
+
+				<div>
+					<input type="text" ng-model="convertedPlaylist.name">
+				</div>
 
 			</div>
 		</div>

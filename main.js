@@ -21,6 +21,8 @@ appControllers.controller('MainController', [ '$scope', 'Spotify', 'GAuth', 'GDa
     localStorage.setItem('spotify-token', token);
   }
 
+  $scope.convertedPlaylist = { name: "Playlist name on Youtube" };
+
   // Getting Spotify token from local storage
   $scope.spotifyToken = localStorage.getItem('spotify-token');
 
@@ -47,6 +49,8 @@ appControllers.controller('MainController', [ '$scope', 'Spotify', 'GAuth', 'GDa
   function loadSpotifyPlaylists() {
     Spotify.getUserPlaylists($scope.spotifyUser.id, { limit: 50 }).then(function(data) {
       $scope.spotifyPlaylists = data;
+      $scope.selectedPlaylist.playlist = data.items[0];
+      $scope.convertedPlaylist.name = data.items[0].name;
     });
   }
 
@@ -76,6 +80,10 @@ appControllers.controller('MainController', [ '$scope', 'Spotify', 'GAuth', 'GDa
     });
   };
 
+  $scope.updatePlaylistName = function() {
+    $scope.convertedPlaylist.name = $scope.selectedPlaylist.playlist.name;
+  }
+
   $scope.videos = [];
   $scope.playlist = null;
   function afterSongLoading() {
@@ -85,7 +93,7 @@ appControllers.controller('MainController', [ '$scope', 'Spotify', 'GAuth', 'GDa
       {
         part: "snippet,status",
         snippet: {
-          title: $scope.selectedPlaylist.playlist.name
+          title: $scope.convertedPlaylist.name
         },
         status: {
           privacyStatus: 'private'
