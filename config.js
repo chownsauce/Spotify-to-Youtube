@@ -2,7 +2,7 @@ var config = {
 
   spotify: {
     clientId: "fdf3de7b36574e6d84f0b09f956984e0",
-    redirectUri: "http://chownsauce.github.io/Spotify-to-Youtube/"
+    redirectUri: "https://chownsauce.github.io/Spotify-to-Youtube/"
   },
 
   youtube: {
