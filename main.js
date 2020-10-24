@@ -176,7 +176,7 @@ appControllers.controller('MainController', [ '$scope', 'Spotify', 'GAuth', 'GDa
   }
 
   function loadSong(index) {
-    if (index >= $scope.songs.length || index >= 50)
+    if (index >= $scope.songs.length || index >= 500)
       return afterSongLoading();
     GApi.execute('youtube', 'search.list', { part: "id,snippet", q: $scope.songs[index].track.name + " " + $scope.songs[index].track.artists[0].name + ($scope.convertedPlaylist.karaokeMode ? " karaoke" : "") }).then(function(resp) {
       console.log(resp);

@@ -1,12 +1,12 @@
 var config = {
 
   spotify: {
-    clientId: "b92710d7bc9846309e7441a0c1e153fe",
-    redirectUri: "http://ctsd.github.io/Spotify-to-Youtube/"
+    clientId: "fdf3de7b36574e6d84f0b09f956984e0",
+    redirectUri: "http://chownsauce.github.io/Spotify-to-Youtube/"
   },
 
   youtube: {
-    clientId: "85936618816-1j0998ipbdasu4ps4beqd24t2a85g6tq.apps.googleusercontent.com",
+    clientId: "995343835007-gomp8ho3ka9vqnp2adp02vkfml572k48.apps.googleusercontent.com",
     scope: 'https://gdata.youtube.com'
   }
 
